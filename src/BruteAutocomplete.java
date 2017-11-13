@@ -10,20 +10,29 @@ public class BruteAutocomplete implements Autocompletor {
 
 	Term[] myTerms;
 
+	/**
+	 * Create immutable instance with terms constructed from parameter
+	 * @param terms words such that terms[k] is part of a word pair 0 <= k < terms.length
+	 * @param weights weights such that weights[k] corresponds to terms[k]
+	 * @throws NullPointerException if either parameter is null
+	 * @throws IllegalArgumentException if terms.length != weights.length
+	 * @throws IllegalArgumentException if any elements of weights is negative
+	 * @throws IllegalArgumentException if any elements of terms is duplicate
+	 */
 	public BruteAutocomplete(String[] terms, double[] weights) {
-		
+
 		if (terms == null || weights == null) {
 			throw new NullPointerException("One or more arguments null");
 		}
-		
+
 		if (terms.length != weights.length) {
 			throw new IllegalArgumentException("terms and weights are not the same length");
 		}
-		
+
 		myTerms = new Term[terms.length];
-		
+
 		HashSet<String> words = new HashSet<String>();
-		
+
 		for (int i = 0; i < terms.length; i++) {
 			words.add(terms[i]);
 			myTerms[i] = new Term(terms[i], weights[i]);
@@ -31,13 +40,16 @@ public class BruteAutocomplete implements Autocompletor {
 				throw new IllegalArgumentException("Negative weight "+ weights[i]);
 			}
 		}
-		if (words.size() != terms.length)
+		if (words.size() != terms.length) {
 			throw new IllegalArgumentException("Duplicate input terms");
+		}
 	}
 
 	public Iterable<String> topMatches(String prefix, int k) {
-		if (k < 0)
+		if (k < 0) {
 			throw new IllegalArgumentException("Illegal value of k:"+k);
+		}
+		
 		// maintain pq of size k
 		PriorityQueue<Term> pq = new PriorityQueue<Term>(k, new Term.WeightOrder());
 		for (Term t : myTerms) {
@@ -63,7 +75,7 @@ public class BruteAutocomplete implements Autocompletor {
 		double maxWeight = -1;
 		for (Term t : myTerms) {
 			if (t.getWeight() > maxWeight && t.getWord().startsWith(prefix)) {
-			    maxWeight = t.getWeight();
+				maxWeight = t.getWeight();
 				maxTerm = t.getWord();
 			}
 		}
