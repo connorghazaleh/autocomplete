@@ -26,8 +26,10 @@ public class TrieAutocomplete implements Autocompletor {
 	 *             if terms and weights are different weight
 	 */
 	public TrieAutocomplete(String[] terms, double[] weights) {
-		if (terms == null || weights == null)
+		if (terms == null || weights == null) {
 			throw new NullPointerException("One or more arguments null");
+		}
+		
 		// Represent the root as a dummy/placeholder node
 		myRoot = new Node('-', null, 0);
 
@@ -105,21 +107,5 @@ public class TrieAutocomplete implements Autocompletor {
 	public double weightOf(String term) {
 		// TODO complete weightOf
 		return 0.0;
-	}
-
-	/**
-	 * Optional: Returns the highest weighted matches within k edit distance of
-	 * the word. If the word is in the dictionary, then return an empty list.
-	 * 
-	 * @param word
-	 *            The word to spell-check
-	 * @param dist
-	 *            Maximum edit distance to search
-	 * @param k
-	 *            Number of results to return
-	 * @return Iterable in descending weight order of the matches
-	 */
-	public Iterable<String> spellCheck(String word, int dist, int k) {
-		return null;
 	}
 }
