@@ -1,5 +1,6 @@
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -192,5 +193,115 @@ public class TestBinarySearchAutocomplete {
 		assertEquals(3, BinarySearchAutocomplete.lastIndexOf(terms, new Term("app", 0), new Term.PrefixOrder(3)));
 		assertEquals(6, BinarySearchAutocomplete.lastIndexOf(terms, new Term("ba", 0), new Term.PrefixOrder(2)));
 		assertEquals(9, BinarySearchAutocomplete.lastIndexOf(terms, new Term("b", 0), new Term.PrefixOrder(1)));
+	}
+	
+	@Test(timeout = 10000)
+	public void testFirstIndexOfAllEqual(){
+		for(int i = 2; i <= 256; i = i*2){
+			Term[] terms = new Term[i];
+			for(int j = 0; j < i; j++){
+				terms[j] = new Term(""+(char)j, 0);
+			}
+			AllEqual comp = new AllEqual();
+			assertEquals("all equal "+i,0, BinarySearchAutocomplete.
+					firstIndexOf(terms, new Term("a", 0), comp));
+		}
+	}
+	
+	@Test(timeout = 10000)
+	public void testLastIndexOfAllEqual(){
+		AllEqual comp = new AllEqual();
+		for(int i = 2; i <= 256; i = i*2){
+			Term[] terms = new Term[i];
+			for(int j = 0; j < i; j++){
+				terms[j] = new Term(""+(char)j, 0);
+			}
+			assertEquals(i-1, BinarySearchAutocomplete.
+					lastIndexOf(terms, new Term("a", 0), comp));
+		}
+	}
+	
+	/**Tests if firstIndexOf or lastIndexOf change the arrays passed in
+	 */
+	@Test(timeout = 10000)
+	public void testFirstIndexOfMutates(){
+		for(int i = 2; i <= 256; i = i*2){
+			Term[] terms = new Term[i];
+			for(int j = 0; j < i; j++){
+				terms[j] = new Term(""+(char)j, j);
+			}
+			Term[] terms2 = terms.clone();
+			BinarySearchAutocomplete.firstIndexOf(
+					terms2, new Term("a", 0), new Term.PrefixOrder(1));
+			assertArrayEquals("firstIndexOf mutates arguments",
+					terms, terms2);
+		}
+	}
+	
+	@Test(timeout = 10000)
+	public void testLastIndexOfMutates(){
+		for(int i = 2; i <= 256; i = i*2){
+			Term[] terms = new Term[i];
+			for(int j = 0; j < i; j++){
+				terms[j] = new Term(""+(char)j, j);
+			}
+			Term[] terms2 = terms.clone();
+			BinarySearchAutocomplete.lastIndexOf(
+					terms2, new Term("a", 0), new Term.PrefixOrder(1));
+			assertArrayEquals("firstIndexOf mutates arguments",
+					terms, terms2);
+		}
+	}
+	
+	@Test(timeout = 10000)
+	public void testFirstIndexOfUsesEquals(){
+		WeightSorter comp = new WeightSorter();
+		for(int i = 2; i <= 256; i = i*2){
+			Term[] terms = new Term[i];
+			for(int j = 0; j < i; j++){
+				terms[j] = new Term("a", j);
+			}
+			assertEquals("first index of issue",0, BinarySearchAutocomplete.
+					firstIndexOf(terms, new Term("b", 0), comp));
+		}
+	}
+	
+
+	@Test(timeout = 10000)
+	public void testLastIndexOfUsesEquals(){
+		WeightSorter comp = new WeightSorter();
+		for(int i = 2; i <= 256; i = i*2){
+			Term[] terms = new Term[i];
+			for(int j = 0; j < i; j++){
+				terms[j] = new Term("b", j);
+			}
+			assertEquals("last index issue",i-1, BinarySearchAutocomplete.
+					lastIndexOf(terms, new Term("a", i-1), comp));
+		}
+	}
+
+	/**
+	 * Tests that constructor throws the correct exceptions
+	 */
+	@Test(timeout = 10000)
+	public void testConstructorException(){
+		try{
+			Autocompletor test = getInstance(null, myWeights);
+			fail("No exception thrown");
+		}
+		catch(NullPointerException e){
+		}
+		catch(Throwable e){
+			fail("Wrong throw");
+		}
+		try{
+			Autocompletor test = getInstance(myNames, null);
+			fail("No exception thrown");
+		}
+		catch(NullPointerException e){
+		}
+		catch(Throwable e){
+			fail("Wrong throw");
+		}
 	}
 }
