@@ -13,6 +13,8 @@ public class AutocompletorBenchmark {
 	public static final Locale LOCALE = Locale.US;
 	public static Autocompletor getInstance(String[] words, double[] weights) {
 		return new BruteAutocomplete(words, weights);
+		//return new BinarySearchAutocomplete(words,weights);
+		//return new TrieAutocomplete(words,weights);
 	}
 	// chooser allows users to select a file by navigating through
 	// directories
@@ -104,16 +106,17 @@ public class AutocompletorBenchmark {
 			System.out.println(
 					"Time for topMatch(\"" + query + "\") - " + (System.nanoTime() - startTime) / (1E9 * trial));
 		}
+		final int NTRIALS = 100;
 		for (String query : queries) {
-			for (int k = 1; k <= 7; k += 3) {
+			for (int k = 1; k <= 256; k *= 2) {
 				startTime = System.nanoTime();
-				for (trial = 0; trial < 1000; trial++) {
+				for (trial = 0; trial < NTRIALS; trial++) {
 					auto.topMatches(query, k);
 					if (System.nanoTime() - startTime > 5E9)
 						break;
 				}
 				System.out.println("Time for topKMatches(\"" + query + "\", " + k + ")" + " - " + " "
-						+ (System.nanoTime() - startTime) / (1E9 * trial));
+						+ (System.nanoTime() - startTime) / (1E9 * NTRIALS));
 			}
 		}
 	}
