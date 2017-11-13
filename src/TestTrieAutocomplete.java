@@ -10,12 +10,12 @@ public class TestTrieAutocomplete {
 
 	Term[] terms =
 			new Term[] {new Term("ape", 6), 
-			new Term("app", 4), 
-			new Term("ban", 2),
-			new Term("bat", 3),
-			new Term("bee", 5),
-			new Term("car", 7),
-			new Term("cat", 1)};
+					new Term("app", 4), 
+					new Term("ban", 2),
+					new Term("bat", 3),
+					new Term("bee", 5),
+					new Term("car", 7),
+					new Term("cat", 1)};
 	String[] names= {"ape", "app", "ban", "bat", "bee", "car", "cat"};
 	double[] weights = {6, 4, 2, 3, 5, 7, 1};
 
@@ -59,7 +59,7 @@ public class TestTrieAutocomplete {
 		}
 		return output;
 	}
-	
+
 
 	/**Tests correctness of topMatch() for a few simple cases
 	 */
@@ -127,12 +127,12 @@ public class TestTrieAutocomplete {
 		ArrayList<Term> termList = new ArrayList<Term>();
 		Term[] terms =
 				new Term[] {new Term("ape", 6), 
-				new Term("app", 4), 
-				new Term("ban", 2),
-				new Term("bat", 3),
-				new Term("bee", 5),
-				new Term("car", 7),
-				new Term("cat", 1)};
+						new Term("app", 4), 
+						new Term("ban", 2),
+						new Term("bat", 3),
+						new Term("bee", 5),
+						new Term("car", 7),
+						new Term("cat", 1)};
 		String[] queries = {"", "a", "ap", "ape", "app", "b", "ba", "ban", 
 				"bat", "be", "bee",	"c", "ca", "car", "cat", "f"};
 		for(Term t: terms)
@@ -155,6 +155,67 @@ public class TestTrieAutocomplete {
 			outputs.add(output);
 			assertTrue("results depend on add order",
 					outputs.size() <= 1);
+		}
+	}
+
+	@Test(timeout = 10000) 
+	public void testMultipleInstances(){
+		String[] names= {"day", "dip", "ear", "eat", "eye", "fir", "fun"};
+		double[] weights = {13, 11, 9, 10, 12, 14, 8};
+		Autocompletor test1 = getInstance();
+		Autocompletor test2 = getInstance(names, weights);
+		String[] queries1 = 
+			{"", "a", "ap", "b", "ba", "c", "ca", "cat", "d", " "};
+		String[] results1 = 
+			{"car", "ape", "ape", "bee", "bat", "car", "car", "cat", "", ""};
+		String[] queries2 =
+			{"", "d", "di", "e", "ea", "f", "fi", "fun", "g" ," "};
+		String[] results2 =
+			{"fir", "day", "dip", "eye", "eat", "fir", "fir", "fun", "", ""};
+		for(int i = 0; i < queries1.length; i++){
+			String query1 = queries1[i];
+			String reported1 = test1.topMatch(query1);
+			String actual1 = results1[i];
+			String query2 = queries2[i];
+			String reported2 = test2.topMatch(query2);
+			String actual2 = results2[i];
+			assertEquals("wrong top match for "+query1, actual1, reported1);
+			assertEquals("wrong top match for "+query2, actual2, reported2);
+		}
+		int[] ks = {8, 1, 2, 3, 1, 1, 2, 2, 100, 1};
+		String[][] results3 =
+			{
+					{"car", "ape", "bee", "app", "bat", "ban", "cat"},
+					{"ape"},
+					{"ape", "app"},
+					{"bee", "bat", "ban"},
+					{"bat"},
+					{"car"},
+					{"car", "cat"},
+					{"cat"},
+					{},
+					{}				
+			};
+		String[][] results4 = 
+			{
+					{"fir", "day", "eye", "dip", "eat", "ear", "fun"},
+					{"day"},
+					{"dip"},
+					{"eye", "eat", "ear"},
+					{"eat"},
+					{"fir"},
+					{"fir"},
+					{"fun"},
+					{},
+					{}
+			};
+		for(int i = 0; i < queries1.length; i++){
+			String[] expected1 = results3[i];
+			String[] expected2 = results4[i];
+			String[] observed1 = iterToArr(test1.topMatches(queries1[i], ks[i]));
+			String[] observed2 = iterToArr(test2.topMatches(queries2[i], ks[i]));
+			assertArrayEquals(expected1, observed1);
+			assertArrayEquals(expected2, observed2);
 		}
 	}
 }
