@@ -39,24 +39,15 @@ public class TestTerm {
 	 * This test checks if Term throws a NullPointerException when constructed
 	 * with a null argument
 	 */
-	@Test(timeout = 10000)
-	public void testConstructorException() {
-		try {
-			Term test = new Term(null, 1);
-			fail("No exception thrown for null String");
-		} catch (NullPointerException e) {
-		} catch (Throwable e) {
-			fail("Wrong exception thrown");
-		}
-
-		try {
-			Term test = new Term("test", -1);
-			fail("No exception thrown for invalid weight");
-		} catch (IllegalArgumentException e) {
-		} catch (Throwable e) {
-			fail("Wrong exception thrown");
-		}
+	@Test(timeout = 10000, expected = NullPointerException.class)
+	public void testConstructorNullPointerException() {
+		new Term(null, 1);
 	}
+
+	@Test(timeout = 10000, expected = IllegalArgumentException.class)
+    public void testConstructorIllegalArgumentException() {
+        new Term("test", -1);
+    }
 
 	/**
 	 * Tests that sorting terms without comparator is the same as sorting
