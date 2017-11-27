@@ -1,3 +1,5 @@
+import java.util.*;
+
 /**
  * General trie/priority queue algorithm for implementing Autocompletor
  * 
@@ -29,6 +31,10 @@ public class TrieAutocomplete implements Autocompletor {
 		if (terms == null || weights == null) {
 			throw new NullPointerException("One or more arguments null");
 		}
+
+		if (terms.length != weights.length) {
+			throw new IllegalArgumentException("terms and weights are not the same length");
+		}
 		
 		// Represent the root as a dummy/placeholder node
 		myRoot = new Node('-', null, 0);
@@ -56,7 +62,24 @@ public class TrieAutocomplete implements Autocompletor {
 	 *             IllegalArgumentException if weight is negative.
 	 */
 	private void add(String word, double weight) {
-		// TODO: Implement add
+		// add String str to internal trie
+		Node current = myRoot;
+		for(int k=0; k < word.length(); k++){
+		  char ch = word.charAt(k);
+		  if (current.children.get(ch) == null) {
+		    current.children.put(ch,new Node(ch,current,weight));
+		  }
+		  current = current.children.get(ch);
+		  if (weight > current.mySubtreeMaxWeight) {
+				current.mySubtreeMaxWeight = weight;
+			}
+		}
+		// current now points to a node representing String str
+		current.myWord = word;
+		current.myWeight = weight;
+		current.isWord = true;
+		
+
 	}
 
 	/**
@@ -96,8 +119,16 @@ public class TrieAutocomplete implements Autocompletor {
 	 *             NullPointerException if the prefix is null
 	 */
 	public String topMatch(String prefix) {
-		// TODO: Implement topMatch
-		return null;
+		Node current = myRoot;
+		for(int k=0; k < prefix.length(); k++){
+			current = current.children.get(prefix.charAt(k));
+		}
+		Collection<Node> kids = current.children.values();
+		
+		while 
+		
+
+		return "";
 	}
 
 	/**

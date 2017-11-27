@@ -1,5 +1,4 @@
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 /**
  * 
@@ -35,6 +34,12 @@ public class BinarySearchAutocomplete implements Autocompletor {
 			throw new NullPointerException("One or more arguments null");
 		}
 		
+		for (int i = 0; i < weights.length; i++) {
+			if (weights[i] < 0){
+				throw new IllegalArgumentException("One or more arguments negative");
+			}
+		}
+		
 		myTerms = new Term[terms.length];
 		
 		for (int i = 0; i < terms.length; i++) {
@@ -61,8 +66,45 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	 *         being equal. If no such index exists, return -1 instead.
 	 */
 	public static int firstIndexOf(Term[] a, Term key, Comparator<Term> comparator) {
-		// TODO: Implement firstIndexOf
-		return -1;
+		
+	
+		
+		int low = 0;
+		int high = a.length-1;
+
+	    while (low <= high) {
+	        int mid = (low + high)/2;
+	        Term midval = a[mid];
+	        int cmp = comparator.compare(midval,key);
+	       
+	        
+	        if (cmp < 0)
+	            low = mid + 1;
+	        else if (cmp > 0)
+	            high = mid - 1;
+	        else {
+	        		if ((mid>0)&&(comparator.compare(a[mid-1],a[mid]))==0) {
+	        			high = mid - 1;
+	        		}else
+	        			return mid; //key found
+	        }
+	        
+	            
+	     }
+		
+//		for (int i = 0; i < a.length; i++) {
+//			if (comparator.compare(a[i], key) == 0) {
+//				return i;
+//			}
+//		}
+//		
+//		System.out.println("key not found");
+	    
+	    return -1;  // key not found
+
+
+		
+
 	}
 
 	/**
@@ -79,8 +121,39 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	 *         being equal. If no such index exists, return -1 instead.
 	 */
 	public static int lastIndexOf(Term[] a, Term key, Comparator<Term> comparator) {
-		// TODO: Implement lastIndexOf
-		return -1;
+		int low = 0;
+		int high = a.length-1;
+
+	    while (low <= high) {
+	        int mid = (low + high)/2;
+	        Term midval = a[mid];
+	        int cmp = comparator.compare(midval,key);
+	       
+	        
+	        if (cmp < 0)
+	            low = mid + 1;
+	        else if (cmp > 0)
+	            high = mid - 1;
+	        else {
+		        	if ((mid<a.length-1)&&(comparator.compare(a[mid+1],a[mid]))==0) {
+	        			low = mid + 1;
+	        		}else
+	        			return mid; //key found
+	        			
+	        }
+	        
+	            
+	     }
+	     return -1;  // key not found
+	     
+	     
+//		for (int i = a.length-1; i > -1; i--) {
+//			if (comparator.compare(a[i], key) == 0) {
+//				return i;
+//			}
+//		}
+//		
+//		return -1;
 	}
 
 	/**
@@ -104,8 +177,30 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	 *             NullPointerException if prefix is null
 	 */
 	public Iterable<String> topMatches(String prefix, int k) {
-		// TODO: Implement topMatches
-		return null;
+		
+		if (k < 0) {
+			throw new IllegalArgumentException("Illegal value of k:"+k);
+		}
+		
+		// maintain pq of size k
+		PriorityQueue<Term> pq = new PriorityQueue<Term>(k, new Term.WeightOrder());
+		for (Term t : myTerms) {
+			if (!t.getWord().startsWith(prefix))
+				continue;
+			if (pq.size() < k) {
+				pq.add(t);
+			} else if (pq.peek().getWeight() < t.getWeight()) {
+				pq.remove();
+				pq.add(t);
+			}
+		}
+		int numResults = Math.min(k, pq.size());
+		LinkedList<String> ret = new LinkedList<String>();
+		for (int i = 0; i < numResults; i++) {
+			ret.addFirst(pq.remove().getWord());
+		}
+		
+		return ret;
 	}
 
 	/**
@@ -122,8 +217,15 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	 * 
 	 */
 	public String topMatch(String prefix) {
-		// TODO: Implement topMatch
-		return null;
+		String maxTerm = "";
+		double maxWeight = -1;
+		for (Term t : myTerms) {
+			if (t.getWeight() > maxWeight && t.getWord().startsWith(prefix)) {
+				maxWeight = t.getWeight();
+				maxTerm = t.getWord();
+			}
+		}
+		return maxTerm;
 	}
 
 	/**
@@ -131,7 +233,11 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	 * return 0.0
 	 */
 	public double weightOf(String term) {
-		// TODO complete weightOf
-		return 0.0;
+		for (Term t : myTerms) {
+			if (t.getWord().equalsIgnoreCase(term))
+				return t.getWeight();
+		}
+		// term is not in dictionary return 0
+		return 0;
 	}
 }

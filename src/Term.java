@@ -28,6 +28,12 @@ public class Term implements Comparable<Term> {
 	 */
 	public Term(String word, double weight) {
 		// TODO: Complete Term constructor
+		if (word == null) {
+			throw new NullPointerException("word is null");
+		} 
+		if (weight < 0) {
+			throw new IllegalArgumentException("negative weight "+weight);
+		}
 		myWord = word;
 		myWeight = weight;
 	}
@@ -66,6 +72,7 @@ public class Term implements Comparable<Term> {
 		public PrefixOrder(int r) {
 			this.r = r;
 		}
+		
 
 		/**
 		 * Compares v and w lexicographically using only their first r letters.
@@ -78,8 +85,31 @@ public class Term implements Comparable<Term> {
 		 *            - Two Terms whose words are being compared
 		 */
 		public int compare(Term v, Term w) {
-			// TODO: Implement compare
-			return 0;
+			int least = 0;
+			String littleV = "";
+			String littleW = "";
+			if (v.getWord().length() < w.getWord().length()) {
+				least = v.getWord().length();
+			}
+			if (v.getWord().length() > w.getWord().length()) {
+				least = w.getWord().length();
+			}
+			if (v.getWord().length() == w.getWord().length()) {
+				least = v.getWord().length();
+			}
+			
+			if (least < r) {
+//				littleV = v.getWord().substring(0,least);
+//				littleW = w.getWord().substring(0,least);
+				return v.getWord().compareTo(w.getWord());
+			}
+			if (least >= r) {
+				littleV = v.getWord().substring(0,r);
+				littleW = w.getWord().substring(0,r);
+			}
+	
+			
+			return littleV.compareTo(littleW);
 		}
 	}
 
@@ -91,7 +121,15 @@ public class Term implements Comparable<Term> {
 	 */
 	public static class ReverseWeightOrder implements Comparator<Term> {
 		public int compare(Term v, Term w) {
-			// TODO: Implement ReverseWeightOrder.compare
+			if (v.getWeight() > w.getWeight()) {
+				return -1;
+			}
+			if (v.getWeight() < w.getWeight()) {
+				return 1;
+			}
+			if (v.getWeight() == w.getWeight()) {
+				return 0;
+			}
 			return 0;
 		}
 	}
@@ -104,7 +142,15 @@ public class Term implements Comparable<Term> {
 	 */
 	public static class WeightOrder implements Comparator<Term> {
 		public int compare(Term v, Term w) {
-			// TODO: Implement WeightOrder.compare
+				if (v.getWeight() < w.getWeight()) {
+					return -1;
+				}
+				if (v.getWeight() > w.getWeight()) {
+					return 1;
+				}
+				if (v.getWeight() == w.getWeight()) {
+					return 0;
+				}
 			return 0;
 		}
 	}
