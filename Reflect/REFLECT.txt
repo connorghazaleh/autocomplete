@@ -1,16 +1,16 @@
-Name: firstname lastname
+Name: Connor Ghazaleh
 
-NetID: abc123
+NetID: cfg11
 
-Hours Spent: Give an exact (decimal) number here
+Hours Spent: 15.0
 
-Consulted With: provide names or NetIDs of any students, TAs, or professors you consulted with on the assignment. If you did not consult with anyone, you must explicitly write NONE.
+Consulted With: mc497,enw12
 
 Resources Used: Any books, papers, or online resources. If you did not use any outside resources, you must explicitly write NONE 
 
-Difficulty level: [Given	an integer between 1 (Very Easy) to 10 (Extremely Difficult)]
+Difficulty level: [8]
 
-Impressions: [Your answer here]
+Impressions: [Interesting]
 
 ----------------------------------------------------------------------
 
