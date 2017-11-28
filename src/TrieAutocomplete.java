@@ -121,15 +121,17 @@ public class TrieAutocomplete implements Autocompletor {
 	 *             NullPointerException if prefix is null
 	 */
 	public Iterable<String> topMatches(String prefix, int k) {
+//		if (k == 0) {
+//			return new LinkedList<>();
+//		}
+		
 		Comparator<Node> compN = new Node.ReverseSubtreeMaxWeightComparator();
 		Term.WeightOrder compW = new Term.WeightOrder();
 		PriorityQueue<Node> npq = new PriorityQueue<>(compN);
 		PriorityQueue<Term> tpq = new PriorityQueue<>(k,compW);
 		LinkedList<String> last = new LinkedList<String>();
 		
-		if (k==0) {
-			return new LinkedList<>();
-		}
+		
 		
 		Node root = myRoot;
 		Node current = myRoot;
