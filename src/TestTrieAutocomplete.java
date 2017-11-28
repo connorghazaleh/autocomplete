@@ -105,6 +105,7 @@ public class TestTrieAutocomplete {
 			String query = queries[i];
 			String[] reported = iterToArr(test.topMatches(query, ks[i]));
 			String[] actual = results[i];
+			
 			assertArrayEquals("wrong top matches for "+query+" "+ks[i],
 					actual, reported);
 		}

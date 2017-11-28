@@ -63,21 +63,39 @@ public class TrieAutocomplete implements Autocompletor {
 	 */
 	private void add(String word, double weight) {
 		// add String str to internal trie
-		Node current = myRoot;
-		for(int k=0; k < word.length(); k++){
-		  char ch = word.charAt(k);
-		  if (current.children.get(ch) == null) {
-		    current.children.put(ch,new Node(ch,current,weight));
-		  }
-		  current = current.children.get(ch);
-		  if (weight > current.mySubtreeMaxWeight) {
-				current.mySubtreeMaxWeight = weight;
-			}
+		if(word==null) {
+			throw new NullPointerException();
 		}
+		if(weight<0) {
+			throw new IllegalArgumentException();
+		}
+		Node current = myRoot;
+		
+		for(int k=0; k < word.length(); k++){
+			char ch = word.charAt(k);
+			if (current.children.get(ch) == null) {
+				current.children.put(ch,new Node(ch,current,weight));
+				if (weight > current.mySubtreeMaxWeight) {
+					current.mySubtreeMaxWeight = weight;
+				}
+				current = current.children.get(ch);
+			
+			}else {
+				if (weight>current.mySubtreeMaxWeight) {
+					current.mySubtreeMaxWeight = weight;
+				}
+				current = current.children.get(ch);
+			}	
+		}
+		
+		
 		// current now points to a node representing String str
 		current.myWord = word;
 		current.myWeight = weight;
 		current.isWord = true;
+		current.mySubtreeMaxWeight=weight;
+
+
 		
 
 	}
@@ -103,8 +121,122 @@ public class TrieAutocomplete implements Autocompletor {
 	 *             NullPointerException if prefix is null
 	 */
 	public Iterable<String> topMatches(String prefix, int k) {
-		// TODO: Implement topKMatches
-		return null;
+		Comparator<Node> compN = new Node.ReverseSubtreeMaxWeightComparator();
+		Term.WeightOrder compW = new Term.WeightOrder();
+		PriorityQueue<Node> npq = new PriorityQueue<>(compN);
+		PriorityQueue<Term> tpq = new PriorityQueue<>(k,compW);
+		LinkedList<String> Final = new LinkedList<String>();
+		
+		if (k==0) {
+			return Final;
+		}
+		
+		Node root = myRoot;
+		Node current = myRoot;
+		
+		//find node where prefix ends
+		for (int a=0; a<prefix.length(); a++){
+			if (current.getChild(prefix.charAt(a)) == null)
+				return Final;
+			else
+				current = current.getChild(prefix.charAt(a));
+		}
+		
+		//add all stemming nodes  
+     	npq.add(current);
+     	while (!npq.isEmpty()) {
+          	Node current2 = npq.remove();
+          	if(!tpq.isEmpty()&&tpq.size()==k)
+				if(current2.mySubtreeMaxWeight<tpq.peek().getWeight()){
+					break;
+				}
+          	if (current2.isWord) {
+          		Term g = new Term(current2.getWord(),current2.getWeight());
+              	tpq.add(g);
+          	}
+          	for(Node n : current2.children.values()) {
+              	npq.add(n);
+          	}
+     	}
+     	
+     	
+     	int numResults = Math.min(k, tpq.size());
+		for (int i = 0; i < numResults; i++) {
+			String temp = tpq.remove().getWord();
+			Final.addFirst(temp);
+			System.out.println(temp);
+		}
+		
+		System.out.println("");
+		return Final;
+		
+//		if(prefix==null)
+//			throw new NullPointerException();
+//		Term.WeightOrder t1 =new Term.WeightOrder();
+//		ArrayList<String> ret = new ArrayList<String>();
+//		PriorityQueue<Term> arrayq= new PriorityQueue<Term>(t1);
+//		Node temp=myRoot;
+//		for(int a=0; a<prefix.length(); a++)
+//		{
+//			if(temp.getChild(prefix.charAt(a))==null)
+//				return ret;
+//			else
+//				temp=temp.getChild(prefix.charAt(a));
+//			//System.out.println("ko");
+//		}
+//		//System.out.println(temp.mySubtreeMaxWeight);
+//		
+//		if(k==0)
+//			return ret;
+//		Node.ReverseSubtreeMaxWeightComparator t = new Node.ReverseSubtreeMaxWeightComparator();
+//		PriorityQueue<Node> q = new PriorityQueue<Node>(t);
+//		q.add(temp);
+//		while(!q.isEmpty())
+//		{
+//			//System.out.println("iter "+ q.peek().mySubtreeMaxWeight);
+//			Node current = q.remove();
+//			if(!arrayq.isEmpty()&&arrayq.size()==k)
+//				if(current.mySubtreeMaxWeight<arrayq.peek().getWeight())
+//				{
+//					//System.out.println(current.mySubtreeMaxWeight);
+//					break;
+//				}
+//			
+//			for(Node s:current.children.values())
+//			{
+//				q.add(s);
+//			}
+//			if(current.isWord)
+//			{
+//				Term a = new Term(current.getWord(),current.getWeight());
+//				System.out.println(current.getWord());
+//				arrayq.add(a);
+//				if(arrayq.size()>k)
+//					arrayq.remove();
+//			}
+//		}
+//		System.out.println("");
+//		Stack<String> qs = new Stack<String>();
+//		while(!arrayq.isEmpty()) {
+//			qs.push(arrayq.remove().getWord());
+//			//System.out.print(qs.peek()+ " ");
+//		}
+//		//System.out.println();
+//
+//			while(!qs.isEmpty())	
+//			{
+//				String ghz = qs.pop();
+//				ret.add(ghz);
+//				//
+//				System.out.println(ghz);
+//			}
+//			//System.out.println("");
+//		
+//		//System.out.println();
+//		
+//		// TODO: Implement topKMatches
+//			
+//		  return ret;
 	}
 
 	/**
@@ -121,14 +253,26 @@ public class TrieAutocomplete implements Autocompletor {
 	public String topMatch(String prefix) {
 		Node current = myRoot;
 		for(int k=0; k < prefix.length(); k++){
+			if (current.children.get(prefix.charAt(k))==null) {
+				return "";
+			}
 			current = current.children.get(prefix.charAt(k));
 		}
-		Collection<Node> kids = current.children.values();
 		
-		while 
-		
+		Node root = current;
+		while (current.isWord==false) {
+			//while (current.isWord==false&& current.myWeight!=root.mySubtreeMaxWeight)
+			
+			Collection<Node> kids = current.children.values();
+			for (Node k: kids) {
+				if (k.mySubtreeMaxWeight == root.mySubtreeMaxWeight) {
+					current = k;
+				}
+			}
+		}
 
-		return "";
+
+		return current.myWord;
 	}
 
 	/**
