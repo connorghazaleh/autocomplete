@@ -182,6 +182,10 @@ public class BinarySearchAutocomplete implements Autocompletor {
 			throw new IllegalArgumentException("Illegal value of k:"+k);
 		}
 		
+		if (k==0) {
+			return new LinkedList<>();
+		}
+		
 		// maintain pq of size k
 		PriorityQueue<Term> pq = new PriorityQueue<Term>(k, new Term.WeightOrder());
 		for (Term t : myTerms) {

@@ -125,10 +125,10 @@ public class TrieAutocomplete implements Autocompletor {
 		Term.WeightOrder compW = new Term.WeightOrder();
 		PriorityQueue<Node> npq = new PriorityQueue<>(compN);
 		PriorityQueue<Term> tpq = new PriorityQueue<>(k,compW);
-		LinkedList<String> Final = new LinkedList<String>();
+		LinkedList<String> last = new LinkedList<String>();
 		
 		if (k==0) {
-			return Final;
+			return new LinkedList<>();
 		}
 		
 		Node root = myRoot;
@@ -137,7 +137,7 @@ public class TrieAutocomplete implements Autocompletor {
 		//find node where prefix ends
 		for (int a=0; a<prefix.length(); a++){
 			if (current.getChild(prefix.charAt(a)) == null)
-				return Final;
+				return last;
 			else
 				current = current.getChild(prefix.charAt(a));
 		}
@@ -163,12 +163,12 @@ public class TrieAutocomplete implements Autocompletor {
      	int numResults = Math.min(k, tpq.size());
 		for (int i = 0; i < numResults; i++) {
 			String temp = tpq.remove().getWord();
-			Final.addFirst(temp);
+			last.addFirst(temp);
 			System.out.println(temp);
 		}
 		
 		System.out.println("");
-		return Final;
+		return last;
 		
 //		if(prefix==null)
 //			throw new NullPointerException();
