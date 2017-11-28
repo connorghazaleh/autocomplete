@@ -28,12 +28,16 @@ public class Term implements Comparable<Term> {
 	 */
 	public Term(String word, double weight) {
 		// TODO: Complete Term constructor
+		
+		//checks to make sure inputs are valid
 		if (word == null) {
 			throw new NullPointerException("word is null");
 		} 
 		if (weight < 0) {
 			throw new IllegalArgumentException("negative weight "+weight);
 		}
+		
+		//set instance variables
 		myWord = word;
 		myWeight = weight;
 	}
@@ -85,6 +89,7 @@ public class Term implements Comparable<Term> {
 		 *            - Two Terms whose words are being compared
 		 */
 		public int compare(Term v, Term w) {
+			//finds smallest of the two words and isolates that substring
 			int least = 0;
 			String littleV = "";
 			String littleW = "";
@@ -98,9 +103,8 @@ public class Term implements Comparable<Term> {
 				least = v.getWord().length();
 			}
 			
+			//returns the comparison based on lengths of terms and r
 			if (least < r) {
-//				littleV = v.getWord().substring(0,least);
-//				littleW = w.getWord().substring(0,least);
 				return v.getWord().compareTo(w.getWord());
 			}
 			if (least >= r) {
@@ -121,6 +125,7 @@ public class Term implements Comparable<Term> {
 	 */
 	public static class ReverseWeightOrder implements Comparator<Term> {
 		public int compare(Term v, Term w) {
+			//gets weights of each term and compares them with each other returning neg for greater, pos for less than, and 0 for equal
 			if (v.getWeight() > w.getWeight()) {
 				return -1;
 			}
@@ -142,6 +147,7 @@ public class Term implements Comparable<Term> {
 	 */
 	public static class WeightOrder implements Comparator<Term> {
 		public int compare(Term v, Term w) {
+			//gets weights of each term and compares them with each other returning pos for greater, neg for less than, and 0 for equal
 				if (v.getWeight() < w.getWeight()) {
 					return -1;
 				}

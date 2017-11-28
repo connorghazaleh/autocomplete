@@ -30,16 +30,19 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	 *             NullPointerException if either argument passed in is null
 	 */
 	public BinarySearchAutocomplete(String[] terms, double[] weights) {
+		//checks to see if inputs are valid
 		if (terms == null || weights == null) {
 			throw new NullPointerException("One or more arguments null");
 		}
 		
+		//checks to see if weights are valid
 		for (int i = 0; i < weights.length; i++) {
 			if (weights[i] < 0){
 				throw new IllegalArgumentException("One or more arguments negative");
 			}
 		}
 		
+		//sets instance variables and creates terms
 		myTerms = new Term[terms.length];
 		
 		for (int i = 0; i < terms.length; i++) {
@@ -68,21 +71,23 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	public static int firstIndexOf(Term[] a, Term key, Comparator<Term> comparator) {
 		
 	
-		
+		//sets low and high boundaries
 		int low = 0;
 		int high = a.length-1;
 
+		//while loop iterates through array indices changing boundaries
 	    while (low <= high) {
 	        int mid = (low + high)/2;
 	        Term midval = a[mid];
 	        int cmp = comparator.compare(midval,key);
 	       
-	        
+	       //checks relationship between key and middle value of range and adjusts boundaries accordingly for next iteration 
 	        if (cmp < 0)
 	            low = mid + 1;
 	        else if (cmp > 0)
 	            high = mid - 1;
 	        else {
+	        	//return correct index if in correct place, otherwise reiterates through loop
 	        		if ((mid>0)&&(comparator.compare(a[mid-1],a[mid]))==0) {
 	        			high = mid - 1;
 	        		}else
@@ -92,13 +97,6 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	            
 	     }
 		
-//		for (int i = 0; i < a.length; i++) {
-//			if (comparator.compare(a[i], key) == 0) {
-//				return i;
-//			}
-//		}
-//		
-//		System.out.println("key not found");
 	    
 	    return -1;  // key not found
 
@@ -121,20 +119,24 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	 *         being equal. If no such index exists, return -1 instead.
 	 */
 	public static int lastIndexOf(Term[] a, Term key, Comparator<Term> comparator) {
+		
+		//sets low and high boundaries
 		int low = 0;
 		int high = a.length-1;
 
+		//while loop iterates through array indices changing boundaries
 	    while (low <= high) {
 	        int mid = (low + high)/2;
 	        Term midval = a[mid];
 	        int cmp = comparator.compare(midval,key);
 	       
-	        
+	      //checks relationship between key and middle value of range and adjusts boundaries accordingly for next iteration 
 	        if (cmp < 0)
 	            low = mid + 1;
 	        else if (cmp > 0)
 	            high = mid - 1;
 	        else {
+	        	//return correct index if in correct place, otherwise reiterates through loop
 		        	if ((mid<a.length-1)&&(comparator.compare(a[mid+1],a[mid]))==0) {
 	        			low = mid + 1;
 	        		}else
@@ -147,13 +149,6 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	     return -1;  // key not found
 	     
 	     
-//		for (int i = a.length-1; i > -1; i--) {
-//			if (comparator.compare(a[i], key) == 0) {
-//				return i;
-//			}
-//		}
-//		
-//		return -1;
 	}
 
 	/**
@@ -177,17 +172,17 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	 *             NullPointerException if prefix is null
 	 */
 	public Iterable<String> topMatches(String prefix, int k) {
-		
+		//checks that inputs are valid
 		if (k < 0) {
 			throw new IllegalArgumentException("Illegal value of k:"+k);
 		}
-		
 		if (k==0) {
 			return new LinkedList<>();
 		}
 		
 		// maintain pq of size k
 		PriorityQueue<Term> pq = new PriorityQueue<Term>(k, new Term.WeightOrder());
+		//looks through all of terms and adds word to pq when its weight is the appropriate size and stops when it reaches a point where 
 		for (Term t : myTerms) {
 			if (!t.getWord().startsWith(prefix))
 				continue;
@@ -198,6 +193,8 @@ public class BinarySearchAutocomplete implements Autocompletor {
 				pq.add(t);
 			}
 		}
+		
+		//puts all terms from pq into a linked list to be returned
 		int numResults = Math.min(k, pq.size());
 		LinkedList<String> ret = new LinkedList<String>();
 		for (int i = 0; i < numResults; i++) {
@@ -221,6 +218,7 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	 * 
 	 */
 	public String topMatch(String prefix) {
+		//returns match with highest weight
 		String maxTerm = "";
 		double maxWeight = -1;
 		for (Term t : myTerms) {
@@ -237,6 +235,7 @@ public class BinarySearchAutocomplete implements Autocompletor {
 	 * return 0.0
 	 */
 	public double weightOf(String term) {
+		//returns weight of term
 		for (Term t : myTerms) {
 			if (t.getWord().equalsIgnoreCase(term))
 				return t.getWeight();
